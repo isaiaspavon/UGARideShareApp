@@ -1,26 +1,51 @@
 package edu.uga.cs.ugarideshareapp.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import edu.uga.cs.ugarideshareapp.R;
 
 public class MainActivity extends AppCompatActivity {
 
+    private Button buttonPostRideOffer;
+    private Button buttonPostRideRequest;
+    private Button buttonViewRides;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+
+        buttonPostRideOffer = findViewById(R.id.buttonPostRideOffer);
+        buttonPostRideRequest = findViewById(R.id.buttonPostRideRequest);
+        buttonViewRides = findViewById(R.id.buttonViewRides);
+
+        buttonPostRideOffer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, PostRideActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        buttonPostRideRequest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, PostRideRequestActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        buttonViewRides.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, RidesListActivity.class);
+                startActivity(intent);
+            }
         });
     }
 }

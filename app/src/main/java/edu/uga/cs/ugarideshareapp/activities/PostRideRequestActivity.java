@@ -6,18 +6,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import edu.uga.cs.ugarideshareapp.R;
 
-public class PostRideActivity extends AppCompatActivity {
+public class PostRideRequestActivity extends AppCompatActivity {
 
     private EditText editTextFrom, editTextTo, editTextDateTime;
     private Button buttonPostRide;
@@ -47,14 +43,14 @@ public class PostRideActivity extends AppCompatActivity {
                 // Push ride to database
                 ridesRef.push().setValue(ride)
                         .addOnSuccessListener(aVoid -> {
-                            Toast.makeText(PostRideActivity.this, "Ride posted successfully!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(PostRideRequestActivity.this, "Ride posted successfully!", Toast.LENGTH_SHORT).show();
                             finish(); // Go back to main
                         })
                         .addOnFailureListener(e -> {
-                            Toast.makeText(PostRideActivity.this, "Failed to post ride.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(PostRideRequestActivity.this, "Failed to post ride.", Toast.LENGTH_SHORT).show();
                         });
-
             }
         });
     }
 }
+

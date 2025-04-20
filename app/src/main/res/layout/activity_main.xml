@@ -7,13 +7,35 @@
     android:layout_height="match_parent"
     tools:context=".activities.MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <Button
+            android:id="@+id/buttonPostRideOffer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Post Ride Offer" />
+
+        <Button
+            android:id="@+id/buttonPostRideRequest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Post Ride Request"
+            android:layout_marginTop="16dp" />
+
+        <Button
+            android:id="@+id/buttonViewRides"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="View Rides"
+            android:layout_marginTop="16dp" />
+
+    </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
