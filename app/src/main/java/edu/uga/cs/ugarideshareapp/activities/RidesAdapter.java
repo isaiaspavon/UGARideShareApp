@@ -1,6 +1,5 @@
 package edu.uga.cs.ugarideshareapp.activities;
 
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,12 +10,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
+import edu.uga.cs.ugarideshareapp.models.Ride;
+
 public class RidesAdapter extends RecyclerView.Adapter<RidesAdapter.RideViewHolder> {
 
     private List<Ride> rides;
+    private OnRideClickListener listener;
 
-    public RidesAdapter(List<Ride> rides) {
+    public interface OnRideClickListener {
+        void onRideClick(Ride ride);
+    }
+
+    public RidesAdapter(List<Ride> rides, OnRideClickListener listener) {
         this.rides = rides;
+        this.listener = listener;
     }
 
     @NonNull
@@ -31,6 +38,12 @@ public class RidesAdapter extends RecyclerView.Adapter<RidesAdapter.RideViewHold
         Ride ride = rides.get(position);
         holder.text1.setText(ride.getFromLocation() + " → " + ride.getToLocation());
         holder.text2.setText(ride.getDateTime());
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onRideClick(ride);
+            }
+        });
     }
 
     @Override
@@ -38,7 +51,7 @@ public class RidesAdapter extends RecyclerView.Adapter<RidesAdapter.RideViewHold
         return rides.size();
     }
 
-    class RideViewHolder extends RecyclerView.ViewHolder {
+    static class RideViewHolder extends RecyclerView.ViewHolder {
         TextView text1, text2;
 
         public RideViewHolder(@NonNull View itemView) {

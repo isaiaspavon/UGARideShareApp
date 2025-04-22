@@ -12,6 +12,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import edu.uga.cs.ugarideshareapp.R;
+import edu.uga.cs.ugarideshareapp.models.Ride;
 
 public class PostRideRequestActivity extends AppCompatActivity {
 

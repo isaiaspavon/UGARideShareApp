@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.uga.cs.ugarideshareapp.R;
-import edu.uga.cs.ugarideshareapp.activities.Ride; // Make sure you import your Ride class
-import edu.uga.cs.ugarideshareapp.activities.RidesAdapter; // Import your adapter if needed
+import edu.uga.cs.ugarideshareapp.models.Ride; // Make sure you import your Ride class
+
 
 public class RidesListActivity extends AppCompatActivity {
 
