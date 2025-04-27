@@ -92,6 +92,10 @@ public class ConfirmRideActivity extends AppCompatActivity {
 
         Toast.makeText(this, "Confirmation recorded.", Toast.LENGTH_SHORT).show();
 
+        // Immediately disable the button after clicking
+        buttonConfirmRide.setEnabled(false);
+        buttonConfirmRide.setText("Ride Confirmed");
+
         // Check if both confirmed
         ridesRef.child(rideId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -105,9 +109,8 @@ public class ConfirmRideActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) { }
         });
-
-        finish(); // Close activity
     }
+
 
     private void completeRide(Ride ride) {
         // Award points
