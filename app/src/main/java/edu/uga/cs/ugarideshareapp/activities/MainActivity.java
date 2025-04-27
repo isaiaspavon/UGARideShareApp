@@ -32,6 +32,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        Button buttonViewRequests = findViewById(R.id.buttonViewRequests);
+
+        buttonViewRequests.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, RidesRequestListActivity.class);
+            startActivity(intent);
+        });
+
         buttonPostRideRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
