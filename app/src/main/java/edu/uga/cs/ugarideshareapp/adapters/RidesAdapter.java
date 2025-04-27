@@ -1,4 +1,4 @@
-package edu.uga.cs.ugarideshareapp.activities;
+package edu.uga.cs.ugarideshareapp.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;

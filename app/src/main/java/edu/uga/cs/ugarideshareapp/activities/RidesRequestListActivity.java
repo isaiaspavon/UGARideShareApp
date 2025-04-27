@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.uga.cs.ugarideshareapp.R;
+import edu.uga.cs.ugarideshareapp.adapters.RideRequestAdapter;
 import edu.uga.cs.ugarideshareapp.models.Ride;
 
 public class RidesRequestListActivity extends AppCompatActivity {

@@ -17,6 +17,7 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 
 import edu.uga.cs.ugarideshareapp.R;
 import edu.uga.cs.ugarideshareapp.activities.LoginActivity;
+import edu.uga.cs.ugarideshareapp.models.User;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -81,9 +82,22 @@ public class RegisterActivity extends AppCompatActivity {
                     progressBar.setVisibility(View.GONE);
                     if (task.isSuccessful()) {
                         // Successfully registered
-                        Toast.makeText(RegisterActivity.this, "Registration successful!", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
-                        finish();
+                        String userId = mAuth.getCurrentUser().getUid();
+
+                        // Now save the user object with starting points into the Realtime Database
+                        com.google.firebase.database.FirebaseDatabase.getInstance()
+                                .getReference("users")
+                                .child(userId)
+                                .setValue(new User(userId, email, 20))  // <-- Start with 20 points!
+                                .addOnCompleteListener(dbTask -> {
+                                    if (dbTask.isSuccessful()) {
+                                        Toast.makeText(RegisterActivity.this, "Registration successful!", Toast.LENGTH_SHORT).show();
+                                        startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+                                        finish();
+                                    } else {
+                                        Toast.makeText(RegisterActivity.this, "Failed to save user: " + dbTask.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                    }
+                                });
                     } else {
                         // Handle duplicate email error
                         if (task.getException() instanceof FirebaseAuthUserCollisionException) {
@@ -94,4 +108,5 @@ public class RegisterActivity extends AppCompatActivity {
                     }
                 });
     }
+
 }
