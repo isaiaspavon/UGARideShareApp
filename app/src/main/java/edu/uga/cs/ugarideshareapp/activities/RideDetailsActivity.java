@@ -83,13 +83,19 @@ public class RideDetailsActivity extends AppCompatActivity {
             @Override
             public Transaction.Result doTransaction(@NonNull MutableData currentData) {
                 Integer points = currentData.getValue(Integer.class);
+
+                // Initialize points if they don't exist
                 if (points == null) {
-                    return Transaction.abort();
+                    currentData.setValue(50); // Set default points (50)
+                    points = 50; // Now points = 50
                 }
+
+                // Check if the user has enough points
                 if (points < 5) {
-                    // Not enough points
-                    return Transaction.abort();
+                    return Transaction.abort();  // Not enough points
                 }
+
+                // Deduct 5 points from the rider
                 currentData.setValue(points - 5);
                 return Transaction.success(currentData);
             }
@@ -100,7 +106,7 @@ public class RideDetailsActivity extends AppCompatActivity {
                     // Deducted 5 points successfully
 
                     if (currentRide.isOffer()) {
-                        // If the ride is an offer, rider is accepting a driver offer
+                        // If the ride is an offer, the rider is accepting a driver offer
                         rideRef.child("riderUid").setValue(currentUid);
 
                         // Give 5 points to the driver
@@ -116,7 +122,7 @@ public class RideDetailsActivity extends AppCompatActivity {
                                 public Transaction.Result doTransaction(@NonNull MutableData currentData) {
                                     Integer points = currentData.getValue(Integer.class);
                                     if (points == null) {
-                                        currentData.setValue(5); // In case driver had no points yet
+                                        currentData.setValue(5); // Initialize driver points if missing
                                     } else {
                                         currentData.setValue(points + 5);
                                     }
@@ -125,7 +131,7 @@ public class RideDetailsActivity extends AppCompatActivity {
 
                                 @Override
                                 public void onComplete(DatabaseError error, boolean committed, DataSnapshot currentData) {
-                                    // Optionally handle success/failure
+                                    // Optionally handle success/failure for the driver
                                 }
                             });
                         }
@@ -147,4 +153,6 @@ public class RideDetailsActivity extends AppCompatActivity {
             }
         });
     }
+
+
 }
