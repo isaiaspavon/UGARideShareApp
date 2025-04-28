@@ -88,7 +88,7 @@ public class RegisterActivity extends AppCompatActivity {
                         com.google.firebase.database.FirebaseDatabase.getInstance()
                                 .getReference("users")
                                 .child(userId)
-                                .setValue(new User(userId, email, 50))  // <-- Start with 20 points!
+                                .setValue(new User(userId, email, 50))  // <-- Start with 50 points!
                                 .addOnCompleteListener(dbTask -> {
                                     if (dbTask.isSuccessful()) {
                                         Toast.makeText(RegisterActivity.this, "Registration successful!", Toast.LENGTH_SHORT).show();
