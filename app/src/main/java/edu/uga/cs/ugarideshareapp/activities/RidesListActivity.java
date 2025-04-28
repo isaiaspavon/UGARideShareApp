@@ -19,7 +19,7 @@ import edu.uga.cs.ugarideshareapp.R;
 import edu.uga.cs.ugarideshareapp.adapters.RidesAdapter;
 import edu.uga.cs.ugarideshareapp.models.Ride;
 
-public class RidesListActivity extends AppCompatActivity {
+public class RidesListActivity extends AppCompatActivity implements RidesAdapter.OnRideClickListener {
 
     private RecyclerView ridesRecyclerView;
     private List<Ride> rideList;
@@ -27,9 +27,8 @@ public class RidesListActivity extends AppCompatActivity {
     private DatabaseReference ridesRef;
     private String currentUserUid;
 
-    private boolean showingAcceptedRides = false; // NEW
-
-    private Button buttonToggleView; // NEW
+    private boolean showingAcceptedRides = false;
+    private Button buttonToggleView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,39 +38,32 @@ public class RidesListActivity extends AppCompatActivity {
         ridesRecyclerView = findViewById(R.id.ridesRecyclerView);
         ridesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        buttonToggleView = findViewById(R.id.buttonToggleView); // Make sure to add this button in your layout
+        buttonToggleView = findViewById(R.id.buttonToggleView);
 
         rideList = new ArrayList<>();
         currentUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        ridesAdapter = new RidesAdapter(rideList, ride -> {
-            if (showingAcceptedRides) {
-                // If in accepted rides view, go to confirm ride
-                Intent intent = new Intent(RidesListActivity.this, ConfirmRideActivity.class);
-                intent.putExtra("rideId", ride.getId());
-                startActivity(intent);
-            } else {
-                // Otherwise go to ride details to accept ride
-                Intent intent = new Intent(RidesListActivity.this, RideDetailsActivity.class);
-                intent.putExtra("rideId", ride.getId());
-                startActivity(intent);
-            }
-        });
-        ridesRecyclerView.setAdapter(ridesAdapter);
-
         ridesRef = FirebaseDatabase.getInstance().getReference("rides");
 
+        setupAdapter();
         loadRidesFromFirebase();
 
         buttonToggleView.setOnClickListener(v -> {
             showingAcceptedRides = !showingAcceptedRides;
+            setupAdapter();
             loadRidesFromFirebase();
             buttonToggleView.setText(showingAcceptedRides ? "View Available Rides" : "View Accepted Rides");
         });
     }
 
+    private void setupAdapter() {
+        int mode = showingAcceptedRides ? RidesAdapter.MODE_ACCEPT : RidesAdapter.MODE_ACCEPT;
+        ridesAdapter = new RidesAdapter(rideList, this, mode);
+        ridesRecyclerView.setAdapter(ridesAdapter);
+    }
+
     private void loadRidesFromFirebase() {
-        ridesRef.orderByChild("dateTime").addValueEventListener(new ValueEventListener() {
+        ridesRef.orderByChild("dateTime").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 rideList.clear();
@@ -92,7 +84,6 @@ public class RidesListActivity extends AppCompatActivity {
                         }
                     }
                 }
-                ridesAdapter.setShowingAcceptedRides(showingAcceptedRides);
                 ridesAdapter.notifyDataSetChanged();
             }
 
@@ -101,5 +92,30 @@ public class RidesListActivity extends AppCompatActivity {
                 Toast.makeText(RidesListActivity.this, "Failed to load rides.", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    public void onRideClick(Ride ride) {
+        if (showingAcceptedRides) {
+            // User clicks Confirm on accepted ride
+            Intent intent = new Intent(RidesListActivity.this, ConfirmRideActivity.class);
+            intent.putExtra("rideId", ride.getId());
+            startActivity(intent);
+        } else {
+            // User clicks Accept on available ride
+            Intent intent = new Intent(RidesListActivity.this, RideDetailsActivity.class);
+            intent.putExtra("rideId", ride.getId());
+            startActivity(intent);
+        }
+    }
+
+    @Override
+    public void onEditRideClick(Ride ride) {
+        // Not needed in this screen
+    }
+
+    @Override
+    public void onDeleteRideClick(Ride ride) {
+        // Not needed in this screen
     }
 }

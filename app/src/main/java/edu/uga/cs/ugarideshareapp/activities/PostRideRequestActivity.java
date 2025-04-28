@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -32,26 +33,32 @@ public class PostRideRequestActivity extends AppCompatActivity {
         buttonPostRide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Get reference to the rides node in Firebase Realtime Database
                 DatabaseReference ridesRef = FirebaseDatabase.getInstance().getReference("rides");
 
+                // Get the input values
                 String from = editTextFrom.getText().toString();
                 String to = editTextTo.getText().toString();
                 String dateTime = editTextDateTime.getText().toString();
 
-                // isOffer = true for offer, false for request
-                Ride ride = new Ride(from, to, dateTime, true);
+                // Get the current authenticated user's UID
+                String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-                // Push ride to database
+                // Create a new Ride object for the ride request (isOffer = false)
+                Ride ride = new Ride(from, to, dateTime, false, userId);
+
+                // Push ride request to the database
                 ridesRef.push().setValue(ride)
                         .addOnSuccessListener(aVoid -> {
-                            Toast.makeText(PostRideRequestActivity.this, "Ride posted successfully!", Toast.LENGTH_SHORT).show();
-                            finish(); // Go back to main
+                            // Show success message and finish the activity
+                            Toast.makeText(PostRideRequestActivity.this, "Ride request posted successfully!", Toast.LENGTH_SHORT).show();
+                            finish(); // Go back to main activity
                         })
                         .addOnFailureListener(e -> {
-                            Toast.makeText(PostRideRequestActivity.this, "Failed to post ride.", Toast.LENGTH_SHORT).show();
+                            // Show failure message
+                            Toast.makeText(PostRideRequestActivity.this, "Failed to post ride request.", Toast.LENGTH_SHORT).show();
                         });
             }
         });
     }
 }
-

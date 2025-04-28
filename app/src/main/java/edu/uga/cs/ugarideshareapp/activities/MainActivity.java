@@ -26,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonViewRides;
     private TextView textViewPoints;
 
+    private Button buttonMyOffers;
+
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
 
@@ -37,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
         buttonPostRideOffer = findViewById(R.id.buttonPostRideOffer);
         buttonPostRideRequest = findViewById(R.id.buttonPostRideRequest);
         buttonViewRides = findViewById(R.id.buttonViewRides);
-        textViewPoints = findViewById(R.id.textViewPoints); // Ensure the ID matches your XML layout
+        textViewPoints = findViewById(R.id.textViewPoints);
+         buttonMyOffers= findViewById(R.id.buttonViewMyOffers);
 
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -69,6 +72,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, RidesListActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        buttonMyOffers = findViewById(R.id.buttonViewMyOffers);
+
+        buttonMyOffers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, MyRideOffersActivity.class);
                 startActivity(intent);
             }
         });

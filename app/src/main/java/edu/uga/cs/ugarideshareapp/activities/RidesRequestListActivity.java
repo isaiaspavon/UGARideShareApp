@@ -16,13 +16,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.uga.cs.ugarideshareapp.R;
-import edu.uga.cs.ugarideshareapp.adapters.RideRequestAdapter;
+import edu.uga.cs.ugarideshareapp.adapters.RidesAdapter;
 import edu.uga.cs.ugarideshareapp.models.Ride;
 
 public class RidesRequestListActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
-    private RideRequestAdapter adapter;
+    private RidesAdapter adapter;
     private List<Ride> requestList = new ArrayList<>();
     private DatabaseReference ridesRef;
     private String currentUserUid;
@@ -36,7 +36,23 @@ public class RidesRequestListActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         currentUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        adapter = new RideRequestAdapter(requestList, this::onRequestClicked);
+        adapter = new RidesAdapter(requestList, new RidesAdapter.OnRideClickListener() {
+            @Override
+            public void onRideClick(Ride ride) {
+                onRequestClicked(ride); // Handle accept ride click
+            }
+
+            @Override
+            public void onEditRideClick(Ride ride) {
+                // not needed here
+            }
+
+            @Override
+            public void onDeleteRideClick(Ride ride) {
+                // not needed here
+            }
+        }, RidesAdapter.MODE_ACCEPT); // <- IMPORTANT: setting mode to accept
+
         recyclerView.setAdapter(adapter);
 
         ridesRef = FirebaseDatabase.getInstance().getReference("rides");

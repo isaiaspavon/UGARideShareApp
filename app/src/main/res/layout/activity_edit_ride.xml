@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.EditRideActivity">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <EditText
+            android:id="@+id/editFromLocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="From Location"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/editToLocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="To Location"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/editDateTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Date and Time"
+            android:inputType="datetime" />
+
+        <Button
+            android:id="@+id/saveButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

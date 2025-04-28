@@ -6,17 +6,17 @@ public class Ride {
     private String toLocation;
     private String dateTime;
     private boolean isOffer; // true = offer, false = request
-    private String driverUid;
-    private String riderUid;
+    private String driverUid; // Only applicable for offers
+    private String riderUid; // Only applicable for requests
+    private String userId; // User who created the ride (Offer or Request)
     private String status; // "available", "accepted", "completed"
-    private boolean confirmDriver;
-    private boolean confirmRider;
+    private boolean confirmDriver; // Used for confirmation by the driver
+    private boolean confirmRider; // Used for confirmation by the rider
 
-    public Ride() {
-        // Required by Firebase
-    }
+    // Required by Firebase
+    public Ride() {}
 
-    public Ride(String fromLocation, String toLocation, String dateTime, boolean isOffer) {
+    public Ride(String fromLocation, String toLocation, String dateTime, boolean isOffer, String userId) {
         this.fromLocation = fromLocation;
         this.toLocation = toLocation;
         this.dateTime = dateTime;
@@ -24,8 +24,9 @@ public class Ride {
         this.status = "available";
         this.confirmDriver = false;
         this.confirmRider = false;
-        this.driverUid = null;
-        this.riderUid = null;
+        this.userId = userId; // The user who created the ride
+        this.driverUid = isOffer ? userId : null; // Only the driver has this
+        this.riderUid = isOffer ? null : userId; // Only the rider has this
     }
 
     // Getters and setters
@@ -42,13 +43,16 @@ public class Ride {
     public void setDateTime(String dateTime) { this.dateTime = dateTime; }
 
     public boolean isOffer() { return isOffer; }
-    public void setIsOffer(boolean offer) { isOffer = offer; }
+    public void setOffer(boolean offer) { this.isOffer = offer; }  // Added setter for Firebase compatibility
 
     public String getDriverUid() { return driverUid; }
     public void setDriverUid(String driverUid) { this.driverUid = driverUid; }
 
     public String getRiderUid() { return riderUid; }
     public void setRiderUid(String riderUid) { this.riderUid = riderUid; }
+
+    public String getUserId() { return userId; } // User who created the ride
+    public void setUserId(String userId) { this.userId = userId; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }

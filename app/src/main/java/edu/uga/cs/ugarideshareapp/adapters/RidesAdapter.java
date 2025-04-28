@@ -11,26 +11,30 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-import edu.uga.cs.ugarideshareapp.models.Ride;
 import edu.uga.cs.ugarideshareapp.R;
+import edu.uga.cs.ugarideshareapp.models.Ride;
 
 public class RidesAdapter extends RecyclerView.Adapter<RidesAdapter.RideViewHolder> {
 
-    private List<Ride> rides;
+    public static final int MODE_ACCEPT = 0;
+    public static final int MODE_EDIT_DELETE = 1;
+
+    public static final int MODE_CONFIRM = 2;
+
+    private List<Ride> rideList;
     private OnRideClickListener listener;
-    private boolean showingAcceptedRides = false; // NEW
+    private int mode;
 
     public interface OnRideClickListener {
         void onRideClick(Ride ride);
+        void onEditRideClick(Ride ride);
+        void onDeleteRideClick(Ride ride);
     }
 
-    public RidesAdapter(List<Ride> rides, OnRideClickListener listener) {
-        this.rides = rides;
+    public RidesAdapter(List<Ride> rideList, OnRideClickListener listener, int mode) {
+        this.rideList = rideList;
         this.listener = listener;
-    }
-
-    public void setShowingAcceptedRides(boolean value) {
-        this.showingAcceptedRides = value;
+        this.mode = mode;
     }
 
     @NonNull
@@ -42,35 +46,72 @@ public class RidesAdapter extends RecyclerView.Adapter<RidesAdapter.RideViewHold
 
     @Override
     public void onBindViewHolder(@NonNull RideViewHolder holder, int position) {
-        Ride ride = rides.get(position);
+        Ride ride = rideList.get(position);
+
         holder.textRideInfo.setText(ride.getFromLocation() + " → " + ride.getToLocation() + "\n" + ride.getDateTime());
 
-        if (showingAcceptedRides) {
-            holder.buttonAction.setText("Confirm Ride");
-        } else {
-            holder.buttonAction.setText("Accept Ride");
-        }
+        if (mode == MODE_ACCEPT) {
+            holder.buttonAccept.setVisibility(View.VISIBLE);
+            holder.buttonEdit.setVisibility(View.GONE);
+            holder.buttonDelete.setVisibility(View.GONE);
 
-        holder.buttonAction.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onRideClick(ride);
-            }
-        });
+            holder.buttonAccept.setText("Accept Ride");
+            holder.buttonAccept.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onRideClick(ride);
+                }
+            });
+
+        } else if (mode == MODE_EDIT_DELETE) {
+            holder.buttonAccept.setVisibility(View.GONE);
+            holder.buttonEdit.setVisibility(View.VISIBLE);
+            holder.buttonDelete.setVisibility(View.VISIBLE);
+
+            holder.buttonEdit.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onEditRideClick(ride);
+                }
+            });
+
+            holder.buttonDelete.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onDeleteRideClick(ride);
+                }
+            });
+
+        } else if (mode == MODE_CONFIRM) { // <<< ADD THIS NEW BLOCK
+            holder.buttonAccept.setVisibility(View.VISIBLE);
+            holder.buttonEdit.setVisibility(View.GONE);
+            holder.buttonDelete.setVisibility(View.GONE);
+
+            holder.buttonAccept.setText("Confirm Ride");
+            holder.buttonAccept.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onRideClick(ride);
+                }
+            });
+        }
     }
+
 
     @Override
     public int getItemCount() {
-        return rides.size();
+        return rideList.size();
     }
 
-    static class RideViewHolder extends RecyclerView.ViewHolder {
+    public static class RideViewHolder extends RecyclerView.ViewHolder {
         TextView textRideInfo;
-        Button buttonAction;
+        Button buttonAccept;
+        Button buttonEdit;
+        Button buttonDelete;
 
         public RideViewHolder(@NonNull View itemView) {
             super(itemView);
+
             textRideInfo = itemView.findViewById(R.id.textRideInfo);
-            buttonAction = itemView.findViewById(R.id.buttonAction);
+            buttonAccept = itemView.findViewById(R.id.buttonAction);
+            buttonEdit = itemView.findViewById(R.id.buttonEdit);
+            buttonDelete = itemView.findViewById(R.id.buttonDelete);
         }
     }
 }
