@@ -91,12 +91,12 @@ public class RideDetailsActivity extends AppCompatActivity {
                 }
 
                 // Check if the user has enough points
-                if (points < 5) {
+                if (points < 50) { // may fuck something up
                     return Transaction.abort();  // Not enough points
                 }
 
                 // Deduct 5 points from the rider
-                currentData.setValue(points - 5);
+                currentData.setValue(points - 50);
                 return Transaction.success(currentData);
             }
 
@@ -109,7 +109,7 @@ public class RideDetailsActivity extends AppCompatActivity {
                         // If the ride is an offer, the rider is accepting a driver offer
                         rideRef.child("riderUid").setValue(currentUid);
 
-                        // Give 5 points to the driver
+                        // Give 50 points to the driver
                         if (currentRide.getDriverUid() != null) {
                             DatabaseReference driverRef = FirebaseDatabase.getInstance()
                                     .getReference("users")
@@ -122,9 +122,9 @@ public class RideDetailsActivity extends AppCompatActivity {
                                 public Transaction.Result doTransaction(@NonNull MutableData currentData) {
                                     Integer points = currentData.getValue(Integer.class);
                                     if (points == null) {
-                                        currentData.setValue(5); // Initialize driver points if missing
+                                        currentData.setValue(50); // Initialize driver points if missing
                                     } else {
-                                        currentData.setValue(points + 5);
+                                        currentData.setValue(points + 50);
                                     }
                                     return Transaction.success(currentData);
                                 }
