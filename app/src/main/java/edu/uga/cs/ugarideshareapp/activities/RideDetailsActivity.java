@@ -76,15 +76,75 @@ public class RideDetailsActivity extends AppCompatActivity {
 
         DatabaseReference rideRef = ridesRef.child(rideId);
 
-        if (currentRide.isOffer()) {
-            rideRef.child("riderUid").setValue(currentUid);
-        } else {
-            rideRef.child("driverUid").setValue(currentUid);
-        }
+        DatabaseReference riderRef = FirebaseDatabase.getInstance().getReference("users").child(currentUid).child("points");
 
-        rideRef.child("status").setValue("accepted");
-        Toast.makeText(this, "Ride accepted!", Toast.LENGTH_SHORT).show();
-        buttonAcceptRide.setEnabled(false);
-        buttonAcceptRide.setText("Accepted");
+        riderRef.runTransaction(new Transaction.Handler() {
+            @NonNull
+            @Override
+            public Transaction.Result doTransaction(@NonNull MutableData currentData) {
+                Integer points = currentData.getValue(Integer.class);
+                if (points == null) {
+                    return Transaction.abort();
+                }
+                if (points < 5) {
+                    // Not enough points
+                    return Transaction.abort();
+                }
+                currentData.setValue(points - 5);
+                return Transaction.success(currentData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError error, boolean committed, DataSnapshot currentData) {
+                if (committed) {
+                    // Deducted 5 points successfully
+
+                    if (currentRide.isOffer()) {
+                        // If the ride is an offer, rider is accepting a driver offer
+                        rideRef.child("riderUid").setValue(currentUid);
+
+                        // Give 5 points to the driver
+                        if (currentRide.getDriverUid() != null) {
+                            DatabaseReference driverRef = FirebaseDatabase.getInstance()
+                                    .getReference("users")
+                                    .child(currentRide.getDriverUid())
+                                    .child("points");
+
+                            driverRef.runTransaction(new Transaction.Handler() {
+                                @NonNull
+                                @Override
+                                public Transaction.Result doTransaction(@NonNull MutableData currentData) {
+                                    Integer points = currentData.getValue(Integer.class);
+                                    if (points == null) {
+                                        currentData.setValue(5); // In case driver had no points yet
+                                    } else {
+                                        currentData.setValue(points + 5);
+                                    }
+                                    return Transaction.success(currentData);
+                                }
+
+                                @Override
+                                public void onComplete(DatabaseError error, boolean committed, DataSnapshot currentData) {
+                                    // Optionally handle success/failure
+                                }
+                            });
+                        }
+                    } else {
+                        // Ride is a request, driver is accepting
+                        rideRef.child("driverUid").setValue(currentUid);
+                        // No points awarded here because the rider is the one creating the request
+                    }
+
+                    rideRef.child("status").setValue("accepted");
+
+                    Toast.makeText(RideDetailsActivity.this, "Ride accepted! Points updated.", Toast.LENGTH_SHORT).show();
+                    buttonAcceptRide.setEnabled(false);
+                    buttonAcceptRide.setText("Accepted");
+
+                } else {
+                    Toast.makeText(RideDetailsActivity.this, "Not enough points to accept ride.", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 }
