@@ -28,7 +28,6 @@ public class RidesListActivity extends AppCompatActivity implements RidesAdapter
     private String currentUserUid;
 
     private boolean showingAcceptedRides = false;
-    private Button buttonToggleView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +37,7 @@ public class RidesListActivity extends AppCompatActivity implements RidesAdapter
         ridesRecyclerView = findViewById(R.id.ridesRecyclerView);
         ridesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        buttonToggleView = findViewById(R.id.buttonToggleView);
+        //buttonToggleView = findViewById(R.id.buttonToggleView);
 
         rideList = new ArrayList<>();
         currentUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -48,12 +47,6 @@ public class RidesListActivity extends AppCompatActivity implements RidesAdapter
         setupAdapter();
         loadRidesFromFirebase();
 
-        buttonToggleView.setOnClickListener(v -> {
-            showingAcceptedRides = !showingAcceptedRides;
-            setupAdapter();
-            loadRidesFromFirebase();
-            buttonToggleView.setText(showingAcceptedRides ? "View Available Rides" : "View Accepted Rides");
-        });
     }
 
     private void setupAdapter() {
