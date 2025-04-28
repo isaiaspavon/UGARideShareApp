@@ -25,9 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonPostRideRequest;
     private Button buttonViewRides;
     private TextView textViewPoints;
-
     private Button buttonMyOffers;
-
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
 
@@ -40,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         buttonPostRideRequest = findViewById(R.id.buttonPostRideRequest);
         buttonViewRides = findViewById(R.id.buttonViewRides);
         textViewPoints = findViewById(R.id.textViewPoints);
-        buttonMyOffers= findViewById(R.id.buttonViewMyOffers);
+        buttonMyOffers = findViewById(R.id.buttonViewMyOffers);
 
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -54,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         Button buttonViewRequests = findViewById(R.id.buttonViewRequests);
-
         buttonViewRequests.setOnClickListener(view -> {
             Intent intent = new Intent(MainActivity.this, RidesRequestListActivity.class);
             startActivity(intent);
@@ -76,8 +73,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        buttonMyOffers = findViewById(R.id.buttonViewMyOffers);
-
         buttonMyOffers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
         loadUserPoints();
 
         Button buttonLogout = findViewById(R.id.buttonLogout);
-
         buttonLogout.setOnClickListener(view -> {
             FirebaseAuth.getInstance().signOut();
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
@@ -98,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
-
     }
 
     private void loadUserPoints() {
@@ -108,7 +101,10 @@ public class MainActivity extends AppCompatActivity {
             String userId = firebaseUser.getUid();
 
             // Get reference to the user's points in the database
-            mDatabase.child("users").child(userId).child("points").addListenerForSingleValueEvent(new ValueEventListener() {
+            DatabaseReference userPointsRef = mDatabase.child("users").child(userId).child("points");
+
+            // Add a real-time listener to update points in the UI automatically
+            userPointsRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
@@ -130,6 +126,26 @@ public class MainActivity extends AppCompatActivity {
                 public void onCancelled(DatabaseError databaseError) {
                     // Handle error
                     Toast.makeText(MainActivity.this, "Failed to load points: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (firebaseUser != null) {
+            String userId = firebaseUser.getUid();
+            mDatabase.child("users").child(userId).child("points").removeEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    // No-op
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    // No-op
                 }
             });
         }

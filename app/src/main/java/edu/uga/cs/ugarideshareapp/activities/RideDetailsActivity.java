@@ -143,7 +143,15 @@ public class RideDetailsActivity extends AppCompatActivity {
 
                     rideRef.child("status").setValue("accepted");
 
-                    Toast.makeText(RideDetailsActivity.this, "Ride accepted! Points updated.", Toast.LENGTH_SHORT).show();
+                    // Delete the ride from the database after it is accepted
+                    rideRef.removeValue();  // This removes the ride from the "rides" node
+
+                    // Optionally, remove from any other related lists if necessary
+                    DatabaseReference myRideOffersRef = FirebaseDatabase.getInstance().getReference("users")
+                            .child(currentUid).child("myRideOffers");
+                    myRideOffersRef.child(rideId).removeValue(); // Remove from "My Ride Offers" list
+
+                    Toast.makeText(RideDetailsActivity.this, "Ride accepted and removed from the list! Points updated.", Toast.LENGTH_SHORT).show();
                     buttonAcceptRide.setEnabled(false);
                     buttonAcceptRide.setText("Accepted");
 
@@ -153,6 +161,5 @@ public class RideDetailsActivity extends AppCompatActivity {
             }
         });
     }
-
 
 }
