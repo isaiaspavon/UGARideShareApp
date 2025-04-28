@@ -76,7 +76,10 @@ public class RideDetailsActivity extends AppCompatActivity {
 
         DatabaseReference rideRef = ridesRef.child(rideId);
 
-        DatabaseReference riderRef = FirebaseDatabase.getInstance().getReference("users").child(currentUid).child("points");
+        DatabaseReference riderRef = FirebaseDatabase.getInstance()
+                .getReference("users")
+                .child(currentUid)
+                .child("points");
 
         riderRef.runTransaction(new Transaction.Handler() {
             @NonNull
@@ -84,18 +87,15 @@ public class RideDetailsActivity extends AppCompatActivity {
             public Transaction.Result doTransaction(@NonNull MutableData currentData) {
                 Integer points = currentData.getValue(Integer.class);
 
-                // Initialize points if they don't exist
                 if (points == null) {
-                    currentData.setValue(50); // Set default points (50)
-                    points = 50; // Now points = 50
+                    currentData.setValue(50);
+                    points = 50;
                 }
 
-                // Check if the user has enough points
-                if (points < 50) { // may fuck something up
-                    return Transaction.abort();  // Not enough points
+                if (points < 50) {
+                    return Transaction.abort();
                 }
 
-                // Deduct 50 points from the rider
                 currentData.setValue(points - 50);
                 return Transaction.success(currentData);
             }
@@ -103,13 +103,11 @@ public class RideDetailsActivity extends AppCompatActivity {
             @Override
             public void onComplete(DatabaseError error, boolean committed, DataSnapshot currentData) {
                 if (committed) {
-                    // Deducted 5 points successfully
-
+                    // Points deducted successfully
                     if (currentRide.isOffer()) {
-                        // If the ride is an offer, the rider is accepting a driver offer
+                        // Rider accepting a driver offer
                         rideRef.child("riderUid").setValue(currentUid);
 
-                        // Give 50 points to the driver
                         if (currentRide.getDriverUid() != null) {
                             DatabaseReference driverRef = FirebaseDatabase.getInstance()
                                     .getReference("users")
@@ -122,7 +120,7 @@ public class RideDetailsActivity extends AppCompatActivity {
                                 public Transaction.Result doTransaction(@NonNull MutableData currentData) {
                                     Integer points = currentData.getValue(Integer.class);
                                     if (points == null) {
-                                        currentData.setValue(50); // Initialize driver points if missing
+                                        currentData.setValue(50);
                                     } else {
                                         currentData.setValue(points + 50);
                                     }
@@ -131,27 +129,56 @@ public class RideDetailsActivity extends AppCompatActivity {
 
                                 @Override
                                 public void onComplete(DatabaseError error, boolean committed, DataSnapshot currentData) {
-                                    // Optionally handle success/failure for the driver
+                                    // No action needed
                                 }
                             });
                         }
+
                     } else {
-                        // Ride is a request, driver is accepting
+                        // Driver accepting a ride request
                         rideRef.child("driverUid").setValue(currentUid);
-                        // No points awarded here because the rider is the one creating the request
+
+                        if (currentRide.getRiderUid() != null) {
+                            DatabaseReference riderUserRef = FirebaseDatabase.getInstance()
+                                    .getReference("users")
+                                    .child(currentRide.getRiderUid())
+                                    .child("points");
+
+                            riderUserRef.runTransaction(new Transaction.Handler() {
+                                @NonNull
+                                @Override
+                                public Transaction.Result doTransaction(@NonNull MutableData currentData) {
+                                    Integer points = currentData.getValue(Integer.class);
+                                    if (points == null) {
+                                        currentData.setValue(50);
+                                    } else {
+                                        currentData.setValue(points + 50);
+                                    }
+                                    return Transaction.success(currentData);
+                                }
+
+                                @Override
+                                public void onComplete(DatabaseError error, boolean committed, DataSnapshot currentData) {
+                                    // No action needed
+                                }
+                            });
+                        }
                     }
 
                     rideRef.child("status").setValue("accepted");
 
-                    // Delete the ride from the database after it is accepted
-                    rideRef.removeValue();  // This removes the ride from the "rides" node
+                    // Remove the ride from the database after accepting
+                    rideRef.removeValue();
 
-                    // Optionally, remove from any other related lists if necessary
-                    DatabaseReference myRideOffersRef = FirebaseDatabase.getInstance().getReference("users")
-                            .child(currentUid).child("myRideOffers");
-                    myRideOffersRef.child(rideId).removeValue(); // Remove from "My Ride Offers" list
+                    // Optionally remove from "myRideOffers" if needed
+                    DatabaseReference myRideOffersRef = FirebaseDatabase.getInstance()
+                            .getReference("users")
+                            .child(currentUid)
+                            .child("myRideOffers");
 
-                    Toast.makeText(RideDetailsActivity.this, "Ride accepted and removed from the list! Points updated.", Toast.LENGTH_SHORT).show();
+                    myRideOffersRef.child(rideId).removeValue();
+
+                    Toast.makeText(RideDetailsActivity.this, "Ride accepted and points updated!", Toast.LENGTH_SHORT).show();
                     buttonAcceptRide.setEnabled(false);
                     buttonAcceptRide.setText("Accepted");
 
