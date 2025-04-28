@@ -69,7 +69,7 @@ public class RidesListActivity extends AppCompatActivity implements RidesAdapter
                 rideList.clear();
                 for (DataSnapshot rideSnapshot : snapshot.getChildren()) {
                     Ride ride = rideSnapshot.getValue(Ride.class);
-                    if (ride != null) {
+                    if (ride != null && ride.isOffer() && "available".equals(ride.getStatus())) {
                         ride.setId(rideSnapshot.getKey());
 
                         if (showingAcceptedRides) {

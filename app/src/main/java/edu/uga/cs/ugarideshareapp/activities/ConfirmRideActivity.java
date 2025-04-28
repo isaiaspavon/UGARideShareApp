@@ -113,15 +113,15 @@ public class ConfirmRideActivity extends AppCompatActivity {
 
 
     private void completeRide(Ride ride) {
-        // Award points
         if (ride.getDriverUid() != null && ride.getRiderUid() != null) {
+            // Award driver points
             usersRef.child(ride.getDriverUid()).child("points").runTransaction(new Transaction.Handler() {
                 @NonNull
                 @Override
                 public Transaction.Result doTransaction(@NonNull MutableData currentData) {
                     Integer points = currentData.getValue(Integer.class);
                     if (points == null) {
-                        currentData.setValue(150); // In case driver was missing points field
+                        currentData.setValue(150); // In case driver was missing points
                     } else {
                         currentData.setValue(points + 50);
                     }
@@ -132,25 +132,36 @@ public class ConfirmRideActivity extends AppCompatActivity {
                 public void onComplete(DatabaseError error, boolean committed, DataSnapshot currentData) { }
             });
 
+            // Subtract rider points
             usersRef.child(ride.getRiderUid()).child("points").runTransaction(new Transaction.Handler() {
                 @NonNull
                 @Override
                 public Transaction.Result doTransaction(@NonNull MutableData currentData) {
                     Integer points = currentData.getValue(Integer.class);
                     if (points == null) {
-                        currentData.setValue(50); // Just in case
-                    } else {
+                        currentData.setValue(0); // Rider had no points (should not happen)
+                    } else if (points >= 50) {
                         currentData.setValue(points - 50);
+                    } else {
+                        // Not enough points
+                        return Transaction.abort(); // Stop transaction
                     }
                     return Transaction.success(currentData);
                 }
 
                 @Override
-                public void onComplete(DatabaseError error, boolean committed, DataSnapshot currentData) { }
+                public void onComplete(DatabaseError error, boolean committed, DataSnapshot currentData) {
+                    if (!committed) {
+                        Toast.makeText(ConfirmRideActivity.this, "Rider does not have enough points!", Toast.LENGTH_SHORT).show();
+                    }
+                }
             });
         }
 
-        // Set ride as completed
+        // Mark ride as completed
         ridesRef.child(rideId).child("status").setValue("completed");
+
+        Toast.makeText(ConfirmRideActivity.this, "Ride completed! Points transferred.", Toast.LENGTH_SHORT).show();
     }
+
 }
