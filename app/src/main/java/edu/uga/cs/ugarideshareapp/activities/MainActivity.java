@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         buttonPostRideRequest = findViewById(R.id.buttonPostRideRequest);
         buttonViewRides = findViewById(R.id.buttonViewRides);
         textViewPoints = findViewById(R.id.textViewPoints);
-         buttonMyOffers= findViewById(R.id.buttonViewMyOffers);
+        buttonMyOffers= findViewById(R.id.buttonViewMyOffers);
 
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -88,6 +88,17 @@ public class MainActivity extends AppCompatActivity {
 
         // Load the user's points when the activity starts
         loadUserPoints();
+
+        Button buttonLogout = findViewById(R.id.buttonLogout);
+
+        buttonLogout.setOnClickListener(view -> {
+            FirebaseAuth.getInstance().signOut();
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+        });
+
     }
 
     private void loadUserPoints() {
