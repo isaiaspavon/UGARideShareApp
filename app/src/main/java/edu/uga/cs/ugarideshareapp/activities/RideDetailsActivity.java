@@ -95,7 +95,7 @@ public class RideDetailsActivity extends AppCompatActivity {
                     return Transaction.abort();  // Not enough points
                 }
 
-                // Deduct 5 points from the rider
+                // Deduct 50 points from the rider
                 currentData.setValue(points - 50);
                 return Transaction.success(currentData);
             }
