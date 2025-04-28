@@ -1,3 +1,7 @@
+/*
+Unused class for now. Focusing on RideDetails to handle point logic
+ */
+
 package edu.uga.cs.ugarideshareapp.activities;
 
 import android.os.Bundle;
