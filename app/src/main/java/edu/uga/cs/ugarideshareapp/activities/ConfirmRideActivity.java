@@ -21,6 +21,12 @@ import edu.uga.cs.ugarideshareapp.R;
 import edu.uga.cs.ugarideshareapp.models.Ride;
 import edu.uga.cs.ugarideshareapp.models.User;
 
+/**
+ * ConfirmRideActivity allows a user (either a driver or a rider) to confirm that a scheduled ride took place.
+ * Once both the driver and rider confirm the ride, the ride is marked as completed and ride points are transferred:
+ *  - Driver receives 50 points
+ *  - Rider loses 50 points (if they have enough)
+ */
 public class ConfirmRideActivity extends AppCompatActivity {
 
     private TextView textViewFrom, textViewTo, textViewDateTime, textViewType, textViewStatus;
@@ -30,6 +36,10 @@ public class ConfirmRideActivity extends AppCompatActivity {
     private Ride currentRide;
     private String currentUserUid;
 
+    /**
+     * Initializes the ConfirmRideActivity and loads the ride details.
+     * Sets up the confirmation logic for the current user.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,8 +61,12 @@ public class ConfirmRideActivity extends AppCompatActivity {
         loadRideDetails();
 
         buttonConfirmRide.setOnClickListener(v -> confirmRide());
-    }
+    } // onCreate
 
+    /**
+     * Loads ride details from Firebase and displays them on the screen.
+     * Disables the confirm button if the ride is already marked completed.
+     */
     private void loadRideDetails() {
         ridesRef.child(rideId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -68,17 +82,21 @@ public class ConfirmRideActivity extends AppCompatActivity {
                     if ("completed".equals(currentRide.getStatus())) {
                         buttonConfirmRide.setEnabled(false);
                         buttonConfirmRide.setText("Ride Completed");
-                    }
-                }
-            }
+                    } // if
+                } // if
+            } // onDataChange
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(ConfirmRideActivity.this, "Failed to load ride.", Toast.LENGTH_SHORT).show();
-            }
+            } // onCancelled
         });
-    }
+    } // loadRideDetails
 
+    /**
+     * Confirms that the current user (driver or rider) participated in the ride.
+     * If both parties confirm, the ride is marked as completed and points are transferred.
+     */
     private void confirmRide() {
         if (currentRide == null || rideId == null) return;
 
@@ -92,7 +110,7 @@ public class ConfirmRideActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "You are not part of this ride.", Toast.LENGTH_SHORT).show();
             return;
-        }
+        } // if
 
         Toast.makeText(this, "Confirmation recorded.", Toast.LENGTH_SHORT).show();
 
@@ -107,15 +125,21 @@ public class ConfirmRideActivity extends AppCompatActivity {
                 Ride updatedRide = snapshot.getValue(Ride.class);
                 if (updatedRide != null && updatedRide.isConfirmDriver() && updatedRide.isConfirmRider()) {
                     completeRide(updatedRide);
-                }
-            }
+                } // if
+            } // onDataChange
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) { }
         });
-    }
+    } // confirmRide
 
-
+    /**
+     * Transfers points between the rider and driver and marks the ride as completed.
+     * Driver receives 50 points; rider is deducted 50 points if they have enough.
+     * If not, the ride cannot be completed.
+     *
+     * @param ride The Ride object that is being confirmed as completed.
+     */
     private void completeRide(Ride ride) {
         if (ride.getDriverUid() != null && ride.getRiderUid() != null) {
             // Award driver points
@@ -128,9 +152,9 @@ public class ConfirmRideActivity extends AppCompatActivity {
                         currentData.setValue(150); // In case driver was missing points
                     } else {
                         currentData.setValue(points + 50);
-                    }
+                    } // if
                     return Transaction.success(currentData);
-                }
+                } // doTransaction
 
                 @Override
                 public void onComplete(DatabaseError error, boolean committed, DataSnapshot currentData) { }
@@ -149,23 +173,23 @@ public class ConfirmRideActivity extends AppCompatActivity {
                     } else {
                         // Not enough points
                         return Transaction.abort(); // Stop transaction
-                    }
+                    } // if
                     return Transaction.success(currentData);
-                }
+                } // doTransaction
 
                 @Override
                 public void onComplete(DatabaseError error, boolean committed, DataSnapshot currentData) {
                     if (!committed) {
                         Toast.makeText(ConfirmRideActivity.this, "Rider does not have enough points!", Toast.LENGTH_SHORT).show();
-                    }
-                }
+                    } // if
+                } // onComplete
             });
-        }
+        } // if
 
         // Mark ride as completed
         ridesRef.child(rideId).child("status").setValue("completed");
 
         Toast.makeText(ConfirmRideActivity.this, "Ride completed! Points transferred.", Toast.LENGTH_SHORT).show();
-    }
+    } // completeRide
 
-}
+} // ConfirmRideActivity

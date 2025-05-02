@@ -20,6 +20,11 @@ import com.google.firebase.database.ValueEventListener;
 import edu.uga.cs.ugarideshareapp.R;
 import edu.uga.cs.ugarideshareapp.models.Ride;
 
+/**
+ * EditRideActivity allows users to edit details of an existing ride (offer or request)
+ * that has not yet been accepted. The user can update the date, time, origin, and destination.
+ * Changes are saved back to Firebase Realtime Database.
+ */
 public class EditRideActivity extends AppCompatActivity {
 
     private EditText editFromLocation, editToLocation, editDateTime;
@@ -27,6 +32,11 @@ public class EditRideActivity extends AppCompatActivity {
     private Ride ride;
     private String rideId;
 
+    /**
+     * Initializes the UI, fetches the current ride data, and sets up the save button.
+     *
+     * @param savedInstanceState Bundle containing the saved instance state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,8 +54,13 @@ public class EditRideActivity extends AppCompatActivity {
 
         // Set up the save button to update the ride
         saveButton.setOnClickListener(v -> updateRide());
-    }
+    } // onCreate
 
+    /**
+     * Retrieves the ride data from Firebase and populates the input fields with current values.
+     *
+     * @param rideId The ID of the ride to edit
+     */
     private void fetchRideData(String rideId) {
         DatabaseReference rideRef = FirebaseDatabase.getInstance().getReference("rides").child(rideId);
         rideRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -57,17 +72,21 @@ public class EditRideActivity extends AppCompatActivity {
                     editFromLocation.setText(ride.getFromLocation());
                     editToLocation.setText(ride.getToLocation());
                     editDateTime.setText(ride.getDateTime());
-                }
-            }
+                } // if
+            } // onDataChange
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 // Handle error
                 Toast.makeText(EditRideActivity.this, "Error loading ride data", Toast.LENGTH_SHORT).show();
-            }
+            } // onCancelled
         });
-    }
+    } // fetchRideData
 
+    /**
+     * Updates the ride data in Firebase with the values entered by the user.
+     * Shows a success or failure Toast based on the result.
+     */
     private void updateRide() {
         // Get the updated ride details from the UI
         String updatedFromLocation = editFromLocation.getText().toString();
@@ -91,6 +110,6 @@ public class EditRideActivity extends AppCompatActivity {
                     });
         } else {
             Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
-        }
-    }
-}
+        } // if
+    } // updateRide
+} // EditRideActivity
