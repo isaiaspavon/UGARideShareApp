@@ -15,11 +15,21 @@ import com.google.firebase.database.FirebaseDatabase;
 import edu.uga.cs.ugarideshareapp.R;
 import edu.uga.cs.ugarideshareapp.models.Ride;
 
+/**
+ * PostRideActivity allows users to post a new ride offer as a driver.
+ * The user fills in the origin, destination, and date/time for the ride.
+ * Submitted rides are stored in Firebase Realtime Database under the "rides" node.
+ */
 public class PostRideActivity extends AppCompatActivity {
 
     private EditText editTextFrom, editTextTo, editTextDateTime;
     private Button buttonPostRide;
 
+    /**
+     * Initializes the UI elements and sets up the click listener for posting a ride request.
+     *
+     * @param savedInstanceState previously saved state of the activity
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,7 +68,7 @@ public class PostRideActivity extends AppCompatActivity {
                             // Show failure message
                             Toast.makeText(PostRideActivity.this, "Failed to post ride.", Toast.LENGTH_SHORT).show();
                         });
-            }
+            } // onCreate
         });
-    }
-}
+    } // onCreate
+} // PostRideActivity

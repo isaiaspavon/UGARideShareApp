@@ -23,11 +23,21 @@ import edu.uga.cs.ugarideshareapp.R;
 import edu.uga.cs.ugarideshareapp.adapters.RidesAdapter;
 import edu.uga.cs.ugarideshareapp.models.Ride;
 
+/**
+ * MyRideOffersActivity displays a list of all ride offers or requests posted by the current user.
+ * Users can choose to edit or delete their own rides using this screen.
+ * Firebase Realtime Database is used to retrieve and manage the user's rides.
+ */
 public class MyRideOffersActivity extends AppCompatActivity implements RidesAdapter.OnRideClickListener {
     private RecyclerView recyclerView;
     private RidesAdapter ridesAdapter;
     private List<Ride> allRides = new ArrayList<>();
 
+    /**
+     * Initializes the layout, sets up the RecyclerView, and loads the current user's ride offers.
+     *
+     * @param savedInstanceState the previously saved state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,15 +47,20 @@ public class MyRideOffersActivity extends AppCompatActivity implements RidesAdap
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         fetchRides();
 
-    }
+    } // onCreate
 
+    /**
+     * Fetches all rides from Firebase that belong to the current user.
+     * Filters results based on the authenticated user's UID.
+     * Populates the RecyclerView using a custom RidesAdapter in edit/delete mode.
+     */
     private void fetchRides() {
         DatabaseReference ridesRef = FirebaseDatabase.getInstance().getReference("rides");
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser == null) {
             Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show();
             return;
-        }
+        } // if
         String currentUserId = currentUser.getUid();
 
         ridesRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -57,28 +72,35 @@ public class MyRideOffersActivity extends AppCompatActivity implements RidesAdap
                     if (ride != null && currentUserId.equals(ride.getUserId())) { // Only add user's rides
                         ride.setId(snapshot.getKey()); // Set the ride ID
                         allRides.add(ride);
-                    }
-                }
+                    } // if
+                } // for
 
                 ridesAdapter = new RidesAdapter(allRides, MyRideOffersActivity.this, RidesAdapter.MODE_EDIT_DELETE);
                 recyclerView.setAdapter(ridesAdapter);
-            }
+            } // onDataChange
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Toast.makeText(MyRideOffersActivity.this, "Failed to load rides.", Toast.LENGTH_SHORT).show();
-            }
+            } // onCancelled
         });
-    }
+    } // fetchRides
 
-
-
-
+    /**
+     * Unused in this context. Required by OnRideClickListener.
+     *
+     * @param ride the clicked ride
+     */
     @Override
     public void onRideClick(Ride ride) {
         // Handle the accept ride logic here
-    }
+    } // onRideClick
 
+    /**
+     * Opens EditRideActivity to allow the user to modify the selected ride.
+     *
+     * @param ride the ride selected for editing
+     */
     @Override
     public void onEditRideClick(Ride ride) {
         Toast.makeText(this, "Editing ride: " + ride.getId(), Toast.LENGTH_SHORT).show();
@@ -86,8 +108,13 @@ public class MyRideOffersActivity extends AppCompatActivity implements RidesAdap
         Intent intent = new Intent(this, EditRideActivity.class);
         intent.putExtra("rideId", ride.getId());  // Pass ride ID to the edit screen
         startActivity(intent);
-    }
+    } // onEditRideClick
 
+    /**
+     * Deletes the selected ride from Firebase and refreshes the list.
+     *
+     * @param ride the ride selected for deletion
+     */
     @Override
     public void onDeleteRideClick(Ride ride) {
         // Confirm and delete the ride from Firebase
@@ -101,6 +128,5 @@ public class MyRideOffersActivity extends AppCompatActivity implements RidesAdap
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Failed to delete ride", Toast.LENGTH_SHORT).show();
                 });
-    }
-}
-
+    } // onDeleteRideClick
+} // MyRideOffersActivity
