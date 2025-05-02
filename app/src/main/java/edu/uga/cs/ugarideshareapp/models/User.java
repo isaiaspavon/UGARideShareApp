@@ -1,5 +1,10 @@
 package edu.uga.cs.ugarideshareapp.models;
 
+/**
+ * User represents a registered user of the UGA Ride Share App.
+ * Each user has a unique ID, an email address, and a points balance
+ * used to manage ride credits.
+ */
 public class User {
     private String userId;
     private String email;
@@ -9,6 +14,13 @@ public class User {
     public User() {
     }
 
+    /**
+     * Constructs a User with the given ID, email, and points.
+     *
+     * @param userId unique Firebase user ID
+     * @param email  email address of the user
+     * @param points initial ride points balance
+     */
     public User(String userId, String email, int points) {
         this.userId = userId;
         this.email = email;
