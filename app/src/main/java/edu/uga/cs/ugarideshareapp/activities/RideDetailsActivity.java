@@ -16,6 +16,11 @@ import com.google.firebase.database.*;
 import edu.uga.cs.ugarideshareapp.R;
 import edu.uga.cs.ugarideshareapp.models.Ride;
 
+/**
+ * RideDetailsActivity shows detailed information about a selected ride.
+ * Depending on whether the ride is a request or an offer, the current user can accept it.
+ * Points are transferred between driver and rider upon acceptance, and the ride is marked as accepted.
+ */
 public class RideDetailsActivity extends AppCompatActivity {
 
     private TextView textViewFrom, textViewTo, textViewDateTime, textViewType;
@@ -24,6 +29,11 @@ public class RideDetailsActivity extends AppCompatActivity {
     private String rideId;
     private Ride currentRide;
 
+    /**
+     * Initializes UI elements, loads ride data, and sets up the ride acceptance button.
+     *
+     * @param savedInstanceState previously saved instance state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,8 +51,12 @@ public class RideDetailsActivity extends AppCompatActivity {
         loadRideDetails();
 
         buttonAcceptRide.setOnClickListener(v -> acceptRide());
-    }
+    } // onCreate
 
+    /**
+     * Loads the selected ride's details from Firebase and displays them.
+     * Disables the accept button if the ride is already taken.
+     */
     private void loadRideDetails() {
         ridesRef.child(rideId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -57,17 +71,23 @@ public class RideDetailsActivity extends AppCompatActivity {
                     if (!"available".equals(currentRide.getStatus())) {
                         buttonAcceptRide.setEnabled(false);
                         buttonAcceptRide.setText("Already Accepted");
-                    }
-                }
-            }
+                    } // if
+                } // if
+            } // onDataChange
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(RideDetailsActivity.this, "Failed to load ride details.", Toast.LENGTH_SHORT).show();
-            }
+            } // onCancelled
         });
-    }
+    } // loadRideDetails
 
+    /**
+     * Accepts the selected ride and handles points transfer between users.
+     * - If it's an offer, the current user becomes the rider and pays 50 points.
+     * - If it's a request, the current user becomes the driver and earns 50 points.
+     * - The ride is marked as accepted and removed from the database.
+     */
     private void acceptRide() {
         String currentUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -94,14 +114,14 @@ public class RideDetailsActivity extends AppCompatActivity {
                         currentData.setValue(0);
                     } else {
                         currentData.setValue(points - 50);
-                    }
+                    } // if
                     return Transaction.success(currentData);
-                }
+                } // doTransaction
 
                 @Override
                 public void onComplete(DatabaseError error, boolean committed, DataSnapshot currentData) {
                     // No action needed
-                }
+                } // onComplete
             });
 
             // Award 50 points to the driver (who posted the offer)
@@ -120,16 +140,16 @@ public class RideDetailsActivity extends AppCompatActivity {
                             currentData.setValue(50);
                         } else {
                             currentData.setValue(points + 50);
-                        }
+                        } // if
                         return Transaction.success(currentData);
-                    }
+                    } // doTransaction
 
                     @Override
                     public void onComplete(DatabaseError error, boolean committed, DataSnapshot currentData) {
                         // No action needed
-                    }
+                    } // onComplete
                 });
-            }
+            } // if
         } else {
             // Driver accepting a ride request
             rideRef.child("driverUid").setValue(currentUid);
@@ -150,16 +170,16 @@ public class RideDetailsActivity extends AppCompatActivity {
                             currentData.setValue(0);
                         } else {
                             currentData.setValue(points - 50);
-                        }
+                        } // if
                         return Transaction.success(currentData);
-                    }
+                    } // doTransaction
 
                     @Override
                     public void onComplete(DatabaseError error, boolean committed, DataSnapshot currentData) {
                         // No action needed
-                    }
+                    } // onComplete
                 });
-            }
+            } // if
 
             // Award 50 points to the driver (acceptor)
             DatabaseReference driverRef = FirebaseDatabase.getInstance()
@@ -176,16 +196,16 @@ public class RideDetailsActivity extends AppCompatActivity {
                         currentData.setValue(50);
                     } else {
                         currentData.setValue(points + 50);
-                    }
+                    } // if
                     return Transaction.success(currentData);
-                }
+                } // doTransaction
 
                 @Override
                 public void onComplete(DatabaseError error, boolean committed, DataSnapshot currentData) {
                     // No action needed
-                }
+                } // onComplete
             });
-        }
+        } // if
 
         rideRef.child("status").setValue("accepted");
 
@@ -195,6 +215,6 @@ public class RideDetailsActivity extends AppCompatActivity {
         Toast.makeText(RideDetailsActivity.this, "Ride accepted and points updated!", Toast.LENGTH_SHORT).show();
         buttonAcceptRide.setEnabled(false);
         buttonAcceptRide.setText("Accepted");
-    }
+    } // acceptRide
 
-}
+} // RideDetailsActivity
