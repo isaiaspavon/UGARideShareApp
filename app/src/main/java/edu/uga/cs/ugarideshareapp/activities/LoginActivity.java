@@ -14,6 +14,12 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import edu.uga.cs.ugarideshareapp.R;
 
+/**
+ * LoginActivity handles user authentication using Firebase.
+ * Users enter their email and password to log in and gain access to the main functionality of the app.
+ * If the login is successful, they are navigated to MainActivity.
+ * A link to the RegisterActivity is also provided for new users.
+ */
 public class LoginActivity extends AppCompatActivity {
 
     private EditText editTextEmail, editTextPassword;
@@ -24,6 +30,11 @@ public class LoginActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;  // Firebase authentication instance
 
+    /**
+     * Initializes the login screen UI and sets up click listeners for login and register buttons.
+     *
+     * @param savedInstanceState previously saved state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,10 +61,15 @@ public class LoginActivity extends AppCompatActivity {
                 // Start the RegisterActivity when the "Register Now" button is clicked
                 Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
                 startActivity(intent);
-            }
+            } // onClick
         });
-    }
+    } // onCreate
 
+    /**
+     * Attempts to sign in the user using Firebase Authentication.
+     * Validates input fields before making the login request.
+     * Displays success or error messages based on the result.
+     */
     private void loginUser() {
         String email = editTextEmail.getText().toString().trim();
         String password = editTextPassword.getText().toString().trim();
@@ -62,13 +78,13 @@ public class LoginActivity extends AppCompatActivity {
             editTextEmail.setError("Email is required");
             editTextEmail.requestFocus();
             return;
-        }
+        } // if
 
         if (password.isEmpty()) {
             editTextPassword.setError("Password is required");
             editTextPassword.requestFocus();
             return;
-        }
+        } // if
 
         progressBar.setVisibility(View.VISIBLE);
 
@@ -83,7 +99,7 @@ public class LoginActivity extends AppCompatActivity {
                     } else {
                         // Handle errors like incorrect credentials
                         Toast.makeText(LoginActivity.this, "Login failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                    }
+                    } // if
                 });
-    }
-}
+    } // loginUser
+} // LoginActivity

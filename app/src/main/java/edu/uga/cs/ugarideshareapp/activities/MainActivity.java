@@ -19,6 +19,15 @@ import com.google.firebase.database.ValueEventListener;
 
 import edu.uga.cs.ugarideshareapp.R;
 
+/**
+ * MainActivity serves as the home screen of the UGA Ride Share App.
+ * It displays the user's current ride-point balance and provides navigation to:
+ * - Post ride offers or requests
+ * - View available rides
+ * - View personal offers
+ * - View ride requests
+ * - Logout
+ */
 public class MainActivity extends AppCompatActivity {
 
     private Button buttonPostRideOffer;
@@ -29,6 +38,12 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
 
+    /**
+     * Initializes the main screen, sets up button listeners for navigation,
+     * and loads the user's ride-point balance from Firebase.
+     *
+     * @param savedInstanceState the saved state of the activity
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, PostRideActivity.class);
                 startActivity(intent);
-            }
+            } // onClick
         });
 
         Button buttonViewRequests = findViewById(R.id.buttonViewRequests);
@@ -62,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, PostRideRequestActivity.class);
                 startActivity(intent);
-            }
+            } // onclick
         });
 
         buttonViewRides.setOnClickListener(new View.OnClickListener() {
@@ -70,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, RidesListActivity.class);
                 startActivity(intent);
-            }
+            } // onClick
         });
 
         buttonMyOffers.setOnClickListener(new View.OnClickListener() {
@@ -78,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, MyRideOffersActivity.class);
                 startActivity(intent);
-            }
+            } // onClick
         });
 
         // Load the user's points when the activity starts
@@ -92,8 +107,12 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
-    }
+    } // onCreate
 
+    /**
+     * Loads the current user's ride-point balance from Firebase
+     * and updates the UI in real-time using a value event listener.
+     */
     private void loadUserPoints() {
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -115,22 +134,25 @@ public class MainActivity extends AppCompatActivity {
                         } else {
                             // Points field is missing
                             textViewPoints.setText("Points not available");
-                        }
+                        } // if
                     } else {
                         // User document doesn't exist
                         Toast.makeText(MainActivity.this, "User profile not found", Toast.LENGTH_SHORT).show();
-                    }
-                }
+                    } // if
+                } // onDataChange
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
                     // Handle error
                     Toast.makeText(MainActivity.this, "Failed to load points: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
-                }
+                } // onCancelled
             });
-        }
-    }
+        } // if
+    } // loadUserPoints
 
+    /**
+     * Attempts to remove the Firebase value listener when the activity is stopped.
+     */
     @Override
     protected void onStop() {
         super.onStop();
@@ -141,13 +163,13 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     // No-op
-                }
+                } // onDataChange
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
                     // No-op
-                }
+                } // onCancelled
             });
-        }
-    }
-}
+        } // if
+    } // onStop
+} // MainActivity
