@@ -15,11 +15,21 @@ import com.google.firebase.database.FirebaseDatabase;
 import edu.uga.cs.ugarideshareapp.R;
 import edu.uga.cs.ugarideshareapp.models.Ride;
 
+/**
+ * PostRideRequestActivity allows a user to create and post a ride request.
+ * The request includes origin, destination, and desired date/time.
+ * Submitted ride requests are stored in Firebase Realtime Database.
+ */
 public class PostRideRequestActivity extends AppCompatActivity {
 
     private EditText editTextFrom, editTextTo, editTextDateTime;
     private Button buttonPostRide;
 
+    /**
+     * Initializes the UI elements and sets the listener to submit the ride request to Firebase.
+     *
+     * @param savedInstanceState the previously saved state of the activity
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,7 +68,7 @@ public class PostRideRequestActivity extends AppCompatActivity {
                             // Show failure message
                             Toast.makeText(PostRideRequestActivity.this, "Failed to post ride request.", Toast.LENGTH_SHORT).show();
                         });
-            }
+            } // onClick
         });
-    }
-}
+    } /// onCreate
+} // PostRideRequestActivity
